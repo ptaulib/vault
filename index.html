@@ -342,7 +342,7 @@
     <label>Mot de passe master 3</label>
     <input type="password" id="mp3" placeholder="••••••••" autocomplete="off">
     <div id="login-error"></div>
-    <button class="btn btn-primary btn-full" onclick="doLogin()">▶ Déverrouiller le coffre</button>
+    <button class="btn btn-primary btn-full" onclick="_v.doLogin()">▶ Déverrouiller le coffre</button>
   </div>
 
   <!-- ===== VAULT ===== -->
@@ -351,7 +351,7 @@
       <div class="section-title" style="margin:0">Entrées</div>
       <div style="display:flex;gap:12px;align-items:center">
         <span class="entry-count" id="entry-count">0 entrées</span>
-        <button class="btn btn-sm btn-danger" onclick="doLogout()">✕ Verrouiller</button>
+        <button class="btn btn-sm btn-danger" onclick="_v.doLogout()">✕ Verrouiller</button>
       </div>
     </div>
 
@@ -372,7 +372,7 @@
       </div>
       <label>Mot de passe</label>
       <input type="text" id="new-pass" placeholder="mot de passe">
-      <button class="btn btn-primary btn-full" onclick="addEntry()">+ Enregistrer l'entrée</button>
+      <button class="btn btn-primary btn-full" onclick="_v.addEntry()">+ Enregistrer l'entrée</button>
     </div>
 
     <!-- Password generator -->
@@ -393,10 +393,10 @@
         </div>
         <div style="flex:0">
           <label>&nbsp;</label>
-          <button class="btn btn-green" onclick="generatePassword()">⟳ Générer</button>
+          <button class="btn btn-green" onclick="_v.generatePassword()">⟳ Générer</button>
         </div>
       </div>
-      <div id="gen-result" onclick="copyGenerated()"></div>
+      <div id="gen-result" onclick="_v.copyGenerated()"></div>
       <div style="font-size:11px;color:var(--text-dim);margin-top:6px;display:none" id="gen-hint">Cliquer pour copier</div>
     </div>
 
@@ -406,14 +406,14 @@
       <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
         <div>
           <div style="font-size:11px;letter-spacing:2px;color:var(--text-dim);margin-bottom:8px">Télécharge le coffre chiffré (fichier .vault)</div>
-          <button class="btn btn-green" onclick="exportVault()">⬇ Exporter vault.vault</button>
+          <button class="btn btn-green" onclick="_v.exportVault()">⬇ Exporter vault.vault</button>
         </div>
         <div>
           <div style="font-size:11px;letter-spacing:2px;color:var(--text-dim);margin-bottom:8px">Importer un fichier .vault (remplace les données locales)</div>
           <label style="margin:0" for="import-file">
             <span class="btn" style="cursor:pointer">⬆ Importer un fichier</span>
           </label>
-          <input type="file" id="import-file" accept=".vault,.json" style="display:none" onchange="importVault(event)">
+          <input type="file" id="import-file" style="display:none" onchange="_v.importVault(event)">
         </div>
       </div>
       <div style="margin-top:14px;font-size:11px;color:var(--text-dim);letter-spacing:1px;line-height:1.7">
@@ -424,7 +424,7 @@
 
     <!-- Master password change -->
     <div class="panel">
-      <div class="toggle-section" onclick="toggleMaster()">
+      <div class="toggle-section" onclick="_v.toggleMaster()">
         <span id="master-toggle-icon">▶</span> Modifier les mots de passe master
       </div>
       <div id="master-panel">
@@ -442,7 +442,7 @@
             <input type="password" id="new-mp3" placeholder="••••••••" autocomplete="off">
           </div>
         </div>
-        <button class="btn btn-primary" style="margin-top:20px" onclick="changeMasterPasswords()">✓ Enregistrer les nouveaux masters</button>
+        <button class="btn btn-primary" style="margin-top:20px" onclick="_v.changeMasterPasswords()">✓ Enregistrer les nouveaux masters</button>
       </div>
     </div>
   </div>
@@ -460,8 +460,8 @@
     <label>Mot de passe</label>
     <input type="text" id="edit-pass" placeholder="mot de passe">
     <div class="modal-actions">
-      <button class="btn btn-sm btn-danger" onclick="closeModal()">✕ Annuler</button>
-      <button class="btn btn-sm btn-primary" onclick="saveEdit()">✓ Sauvegarder</button>
+      <button class="btn btn-sm btn-danger" onclick="_v.closeModal()">✕ Annuler</button>
+      <button class="btn btn-sm btn-primary" onclick="_v.saveEdit()">✓ Sauvegarder</button>
     </div>
   </div>
 </div>
@@ -469,6 +469,7 @@
 <div id="toast"></div>
 
 <script>
+(function() {
 // ===== CRYPTO UTILITIES =====
 const STORAGE_KEY = 'vault_data';
 let sessionKey = null; // CryptoKey for AES-GCM
@@ -604,7 +605,7 @@ function doLogout() {
 
 // Allow Enter key on login
 ['mp1','mp2','mp3'].forEach(id => {
-  document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); }); // direct ref inside IIFE
 });
 
 // ===== RENDER =====
@@ -632,10 +633,10 @@ function renderVault() {
       <td class="user-cell">${esc(e.user)}</td>
       <td class="pass-cell" id="pass-${i}">••••••••••••</td>
       <td class="actions-cell">
-        <button class="btn btn-sm" onclick="togglePass(${i})">👁</button>
-        <button class="btn btn-sm btn-green" onclick="copyPass(${i})">⎘ Copier</button>
-        <button class="btn btn-sm" onclick="openEdit(${i})">✎</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteEntry(${i})">✕</button>
+        <button class="btn btn-sm" onclick="_v.togglePass(${i})">👁</button>
+        <button class="btn btn-sm btn-green" onclick="_v.copyPass(${i})">⎘ Copier</button>
+        <button class="btn btn-sm" onclick="_v.openEdit(${i})">✎</button>
+        <button class="btn btn-sm btn-danger" onclick="_v.deleteEntry(${i})">✕</button>
       </td>
     </tr>`;
   });
@@ -819,6 +820,10 @@ function toast(msg) {
 document.getElementById('modal-overlay').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
 });
+
+// Expose only what the HTML onclick= attributes need
+window._v = { doLogin, doLogout, togglePass, copyPass, addEntry, deleteEntry, openEdit, closeModal, saveEdit, generatePassword, copyGenerated, toggleMaster, changeMasterPasswords, exportVault, importVault };
+})();
 </script>
 </body>
 </html>
