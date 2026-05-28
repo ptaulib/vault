@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⬡ VAULT</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap');
+
+  :root {
+    --bg: #080c10;
+    --surface: #0d1318;
+    --surface2: #111820;
+    --border: #1a2a38;
+    --accent: #00e5ff;
+    --accent2: #ff4060;
+    --accent3: #39ff14;
+    --text: #c8dde8;
+    --text-dim: #4a6070;
+    --text-bright: #e8f4fa;
+    --glow: 0 0 12px rgba(0,229,255,0.4);
+    --glow2: 0 0 12px rgba(255,64,96,0.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(0,229,255,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(255,64,96,0.04) 0%, transparent 50%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,229,255,0.02) 39px, rgba(0,229,255,0.02) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,229,255,0.02) 39px, rgba(0,229,255,0.02) 40px);
+  }
+
+  /* ---- LAYOUT ---- */
+  #app { max-width: 860px; margin: 0 auto; padding: 30px 20px; }
+
+  .logo {
+    text-align: center;
+    margin-bottom: 40px;
+    letter-spacing: 16px;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent);
+    text-shadow: var(--glow);
+    font-family: 'Share Tech Mono', monospace;
+  }
+  .logo span { color: var(--text-dim); font-size: 11px; letter-spacing: 6px; display: block; margin-top: 4px; }
+
+  /* ---- LOGIN ---- */
+  #login-screen {
+    max-width: 400px;
+    margin: 60px auto 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 36px 32px;
+    position: relative;
+    clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  }
+  #login-screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,229,255,0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .section-title {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    margin-top: 16px;
+  }
+
+  input[type="password"], input[type="text"], input[type="number"] {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-bright);
+    padding: 10px 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  input:focus {
+    border-color: var(--accent);
+    box-shadow: var(--glow);
+  }
+  input::placeholder { color: var(--text-dim); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 22px;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+  .btn:hover { background: rgba(0,229,255,0.1); box-shadow: var(--glow); }
+  .btn-primary { background: rgba(0,229,255,0.08); }
+  .btn-primary:hover { background: rgba(0,229,255,0.2); }
+  .btn-danger { border-color: var(--accent2); color: var(--accent2); }
+  .btn-danger:hover { background: rgba(255,64,96,0.1); box-shadow: var(--glow2); }
+  .btn-sm {
+    padding: 5px 12px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+  }
+  .btn-green { border-color: var(--accent3); color: var(--accent3); }
+  .btn-green:hover { background: rgba(57,255,20,0.1); }
+
+  .btn-full { width: 100%; justify-content: center; margin-top: 24px; }
+
+  #login-error {
+    margin-top: 14px;
+    color: var(--accent2);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-align: center;
+    min-height: 18px;
+  }
+
+  /* ---- VAULT ---- */
+  #vault-screen { display: none; }
+
+  .vault-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .entry-count {
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--text-dim);
+    font-size: 12px;
+    letter-spacing: 2px;
+  }
+
+  /* Table */
+  .vault-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 32px;
+  }
+  .vault-table th {
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .vault-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(26,42,56,0.5);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    vertical-align: middle;
+  }
+  .vault-table tr:hover td { background: rgba(0,229,255,0.02); }
+
+  .site-cell { color: var(--accent); font-size: 13px; font-weight: 600; font-family: 'Rajdhani', sans-serif; letter-spacing: 1px; }
+  .user-cell { color: var(--text); }
+  .pass-cell { color: var(--text-dim); letter-spacing: 2px; }
+  .pass-cell.revealed { color: var(--accent3); letter-spacing: 0.5px; }
+
+  .actions-cell { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .empty-vault {
+    text-align: center;
+    padding: 48px 0;
+    color: var(--text-dim);
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  /* ---- PANELS ---- */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px;
+    margin-bottom: 24px;
+    position: relative;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  }
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--accent), transparent);
+  }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media(max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+  .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  @media(max-width: 600px) { .form-row-3 { grid-template-columns: 1fr; } }
+
+  /* ---- PASSGEN ---- */
+  .passgen-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .passgen-row > div { flex: 1; min-width: 100px; }
+  #gen-result {
+    margin-top: 14px;
+    padding: 12px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--accent3);
+    font-size: 14px;
+    word-break: break-all;
+    display: none;
+  }
+
+  /* ---- MASTER CHANGE ---- */
+  .toggle-section {
+    margin-top: 8px;
+    cursor: pointer;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+  }
+  .toggle-section:hover { color: var(--accent); }
+  #master-panel { display: none; margin-top: 16px; }
+
+  /* ---- TOAST ---- */
+  #toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    padding: 12px 24px;
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    box-shadow: var(--glow);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    font-family: 'Rajdhani', sans-serif;
+  }
+  #toast.show { opacity: 1; }
+
+  /* ---- EDIT MODAL ---- */
+  #modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(8,12,16,0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(4px);
+  }
+  #modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    padding: 32px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: var(--glow);
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+    position: relative;
+  }
+  .modal-actions { display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); }
+
+  input[type="number"] { -moz-appearance: textfield; }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { opacity: 1; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="logo">⬡ VAULT<span>COFFRE FORT CHIFFRÉ</span></div>
+
+  <!-- ===== LOGIN ===== -->
+  <div id="login-screen">
+    <div class="section-title">Authentification</div>
+    <label>Mot de passe master 1</label>
+    <input type="password" id="mp1" placeholder="••••••••" autocomplete="off">
+    <label>Mot de passe master 2</label>
+    <input type="password" id="mp2" placeholder="••••••••" autocomplete="off">
+    <label>Mot de passe master 3</label>
+    <input type="password" id="mp3" placeholder="••••••••" autocomplete="off">
+    <div id="login-error"></div>
+    <button class="btn btn-primary btn-full" onclick="doLogin()">▶ Déverrouiller le coffre</button>
+  </div>
+
+  <!-- ===== VAULT ===== -->
+  <div id="vault-screen">
+    <div class="vault-header">
+      <div class="section-title" style="margin:0">Entrées</div>
+      <div style="display:flex;gap:12px;align-items:center">
+        <span class="entry-count" id="entry-count">0 entrées</span>
+        <button class="btn btn-sm btn-danger" onclick="doLogout()">✕ Verrouiller</button>
+      </div>
+    </div>
+
+    <div id="vault-list"></div>
+
+    <!-- Add entry -->
+    <div class="panel">
+      <div class="section-title">Nouvelle entrée</div>
+      <div class="form-row">
+        <div>
+          <label>Site / Nom</label>
+          <input type="text" id="new-site" placeholder="gmail.com">
+        </div>
+        <div>
+          <label>Identifiant / Email</label>
+          <input type="text" id="new-user" placeholder="user@example.com">
+        </div>
+      </div>
+      <label>Mot de passe</label>
+      <input type="text" id="new-pass" placeholder="mot de passe">
+      <button class="btn btn-primary btn-full" onclick="addEntry()">+ Enregistrer l'entrée</button>
+    </div>
+
+    <!-- Password generator -->
+    <div class="panel">
+      <div class="section-title">Générateur de mot de passe</div>
+      <div class="passgen-row">
+        <div>
+          <label>Longueur</label>
+          <input type="number" id="gen-len" value="20" min="8" max="128" style="width:100%">
+        </div>
+        <div>
+          <label>Options</label>
+          <div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap">
+            <label style="margin:0;font-size:12px;display:flex;align-items:center;gap:4px"><input type="checkbox" id="gen-upper" checked> A-Z</label>
+            <label style="margin:0;font-size:12px;display:flex;align-items:center;gap:4px"><input type="checkbox" id="gen-num" checked> 0-9</label>
+            <label style="margin:0;font-size:12px;display:flex;align-items:center;gap:4px"><input type="checkbox" id="gen-sym" checked> !@#</label>
+          </div>
+        </div>
+        <div style="flex:0">
+          <label>&nbsp;</label>
+          <button class="btn btn-green" onclick="generatePassword()">⟳ Générer</button>
+        </div>
+      </div>
+      <div id="gen-result" onclick="copyGenerated()"></div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px;display:none" id="gen-hint">Cliquer pour copier</div>
+    </div>
+
+    <!-- Export / Import -->
+    <div class="panel">
+      <div class="section-title">Sauvegarde &amp; Migration</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+        <div>
+          <div style="font-size:11px;letter-spacing:2px;color:var(--text-dim);margin-bottom:8px">Télécharge le coffre chiffré (fichier .vault)</div>
+          <button class="btn btn-green" onclick="exportVault()">⬇ Exporter vault.vault</button>
+        </div>
+        <div>
+          <div style="font-size:11px;letter-spacing:2px;color:var(--text-dim);margin-bottom:8px">Importer un fichier .vault (remplace les données locales)</div>
+          <label style="margin:0" for="import-file">
+            <span class="btn" style="cursor:pointer">⬆ Importer un fichier</span>
+          </label>
+          <input type="file" id="import-file" accept=".vault,.json" style="display:none" onchange="importVault(event)">
+        </div>
+      </div>
+      <div style="margin-top:14px;font-size:11px;color:var(--text-dim);letter-spacing:1px;line-height:1.7">
+        Le fichier exporté est <span style="color:var(--accent)">100% chiffré</span> — il ne contient aucune donnée lisible sans vos 3 mots de passe master.<br>
+        Pour migrer : exporter ici → déployer sur le nouveau serveur → importer le fichier → se connecter avec les mêmes masters.
+      </div>
+    </div>
+
+    <!-- Master password change -->
+    <div class="panel">
+      <div class="toggle-section" onclick="toggleMaster()">
+        <span id="master-toggle-icon">▶</span> Modifier les mots de passe master
+      </div>
+      <div id="master-panel">
+        <div class="form-row-3">
+          <div>
+            <label>Nouveau master 1</label>
+            <input type="password" id="new-mp1" placeholder="••••••••" autocomplete="off">
+          </div>
+          <div>
+            <label>Nouveau master 2</label>
+            <input type="password" id="new-mp2" placeholder="••••••••" autocomplete="off">
+          </div>
+          <div>
+            <label>Nouveau master 3</label>
+            <input type="password" id="new-mp3" placeholder="••••••••" autocomplete="off">
+          </div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:20px" onclick="changeMasterPasswords()">✓ Enregistrer les nouveaux masters</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== EDIT MODAL ===== -->
+<div id="modal-overlay">
+  <div class="modal">
+    <div class="section-title">Modifier l'entrée</div>
+    <input type="hidden" id="edit-id">
+    <label>Site / Nom</label>
+    <input type="text" id="edit-site" placeholder="gmail.com">
+    <label>Identifiant / Email</label>
+    <input type="text" id="edit-user" placeholder="user@example.com">
+    <label>Mot de passe</label>
+    <input type="text" id="edit-pass" placeholder="mot de passe">
+    <div class="modal-actions">
+      <button class="btn btn-sm btn-danger" onclick="closeModal()">✕ Annuler</button>
+      <button class="btn btn-sm btn-primary" onclick="saveEdit()">✓ Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ===== CRYPTO UTILITIES =====
+const STORAGE_KEY = 'vault_data';
+let sessionKey = null; // CryptoKey for AES-GCM
+
+async function deriveKey(passwords) {
+  // Sort passwords so order doesn't matter
+  const sorted = [...passwords].sort();
+  const combined = sorted.join('|VAULT|');
+  const encoder = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', encoder.encode(combined), 'PBKDF2', false, ['deriveKey']
+  );
+  // Use a fixed salt derived from a constant (no server, offline app)
+  const salt = encoder.encode('VAULT_SALT_2024_STATIC');
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: 310000, hash: 'SHA-256' },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
+}
+
+async function encrypt(key, plaintext) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const encoded = new TextEncoder().encode(plaintext);
+  const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoded);
+  // Combine iv + ciphertext, base64 encode
+  const combined = new Uint8Array(iv.byteLength + cipher.byteLength);
+  combined.set(iv, 0);
+  combined.set(new Uint8Array(cipher), iv.byteLength);
+  return btoa(String.fromCharCode(...combined));
+}
+
+async function decrypt(key, b64) {
+  const combined = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  const iv = combined.slice(0, 12);
+  const cipher = combined.slice(12);
+  const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, cipher);
+  return new TextDecoder().decode(plain);
+}
+
+async function hashPasswords(passwords) {
+  const sorted = [...passwords].sort();
+  const combined = sorted.join('|VAULT_HASH|');
+  const encoded = new TextEncoder().encode(combined);
+  const hash = await crypto.subtle.digest('SHA-256', encoded);
+  return btoa(String.fromCharCode(...new Uint8Array(hash)));
+}
+
+// ===== STORAGE =====
+function loadRaw() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch { return null; }
+}
+function saveRaw(obj) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+}
+
+async function loadVault(key) {
+  const raw = loadRaw();
+  if (!raw || !raw.entries) return [];
+  const plain = await decrypt(key, raw.entries);
+  return JSON.parse(plain);
+}
+
+async function saveVault(key, entries) {
+  const raw = loadRaw() || {};
+  raw.entries = await encrypt(key, JSON.stringify(entries));
+  saveRaw(raw);
+}
+
+// ===== STATE =====
+let vaultEntries = [];
+
+// ===== LOGIN =====
+async function doLogin() {
+  const p1 = document.getElementById('mp1').value;
+  const p2 = document.getElementById('mp2').value;
+  const p3 = document.getElementById('mp3').value;
+  const err = document.getElementById('login-error');
+
+  if (!p1 || !p2 || !p3) { err.textContent = '✕ Veuillez remplir les 3 champs'; return; }
+  err.textContent = '';
+
+  const raw = loadRaw();
+
+  // First launch: no data yet, create vault
+  if (!raw || !raw.masterHash) {
+    const key = await deriveKey([p1, p2, p3]);
+    const hash = await hashPasswords([p1, p2, p3]);
+    const newRaw = { masterHash: hash };
+    saveRaw(newRaw);
+    sessionKey = key;
+    await saveVault(key, []);
+    unlockVault([]);
+    return;
+  }
+
+  // Verify master hash
+  const hash = await hashPasswords([p1, p2, p3]);
+  if (hash !== raw.masterHash) {
+    err.textContent = '✕ Mots de passe incorrects';
+    return;
+  }
+
+  const key = await deriveKey([p1, p2, p3]);
+  sessionKey = key;
+
+  try {
+    const entries = await loadVault(key);
+    unlockVault(entries);
+  } catch {
+    err.textContent = '✕ Erreur de déchiffrement';
+  }
+}
+
+function unlockVault(entries) {
+  vaultEntries = entries;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('vault-screen').style.display = 'block';
+  document.getElementById('mp1').value = '';
+  document.getElementById('mp2').value = '';
+  document.getElementById('mp3').value = '';
+  renderVault();
+}
+
+function doLogout() {
+  sessionKey = null;
+  vaultEntries = [];
+  document.getElementById('vault-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'block';
+}
+
+// Allow Enter key on login
+['mp1','mp2','mp3'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+});
+
+// ===== RENDER =====
+function renderVault() {
+  const container = document.getElementById('vault-list');
+  const count = document.getElementById('entry-count');
+  count.textContent = vaultEntries.length + ' entrée' + (vaultEntries.length !== 1 ? 's' : '');
+
+  if (vaultEntries.length === 0) {
+    container.innerHTML = '<div class="empty-vault">— Coffre vide —</div>';
+    return;
+  }
+
+  let html = `<table class="vault-table">
+    <thead><tr>
+      <th>Site / Nom</th>
+      <th>Identifiant</th>
+      <th>Mot de passe</th>
+      <th>Actions</th>
+    </tr></thead><tbody>`;
+
+  vaultEntries.forEach((e, i) => {
+    html += `<tr>
+      <td class="site-cell">${esc(e.site)}</td>
+      <td class="user-cell">${esc(e.user)}</td>
+      <td class="pass-cell" id="pass-${i}">••••••••••••</td>
+      <td class="actions-cell">
+        <button class="btn btn-sm" onclick="togglePass(${i})">👁</button>
+        <button class="btn btn-sm btn-green" onclick="copyPass(${i})">⎘ Copier</button>
+        <button class="btn btn-sm" onclick="openEdit(${i})">✎</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteEntry(${i})">✕</button>
+      </td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ===== ACTIONS =====
+function togglePass(i) {
+  const cell = document.getElementById('pass-' + i);
+  if (cell.classList.contains('revealed')) {
+    cell.textContent = '••••••••••••';
+    cell.classList.remove('revealed');
+  } else {
+    cell.textContent = vaultEntries[i].pass;
+    cell.classList.add('revealed');
+  }
+}
+
+function copyPass(i) {
+  navigator.clipboard.writeText(vaultEntries[i].pass).then(() => toast('Mot de passe copié'));
+}
+
+async function addEntry() {
+  const site = document.getElementById('new-site').value.trim();
+  const user = document.getElementById('new-user').value.trim();
+  const pass = document.getElementById('new-pass').value;
+  if (!site || !user || !pass) { toast('Champs requis manquants'); return; }
+  vaultEntries.push({ id: Date.now(), site, user, pass });
+  await saveVault(sessionKey, vaultEntries);
+  document.getElementById('new-site').value = '';
+  document.getElementById('new-user').value = '';
+  document.getElementById('new-pass').value = '';
+  renderVault();
+  toast('Entrée enregistrée');
+}
+
+async function deleteEntry(i) {
+  if (!confirm('Supprimer cette entrée ?')) return;
+  vaultEntries.splice(i, 1);
+  await saveVault(sessionKey, vaultEntries);
+  renderVault();
+  toast('Entrée supprimée');
+}
+
+function openEdit(i) {
+  const e = vaultEntries[i];
+  document.getElementById('edit-id').value = i;
+  document.getElementById('edit-site').value = e.site;
+  document.getElementById('edit-user').value = e.user;
+  document.getElementById('edit-pass').value = e.pass;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+async function saveEdit() {
+  const i = parseInt(document.getElementById('edit-id').value);
+  vaultEntries[i].site = document.getElementById('edit-site').value.trim();
+  vaultEntries[i].user = document.getElementById('edit-user').value.trim();
+  vaultEntries[i].pass = document.getElementById('edit-pass').value;
+  await saveVault(sessionKey, vaultEntries);
+  closeModal();
+  renderVault();
+  toast('Entrée modifiée');
+}
+
+// ===== PASSWORD GENERATOR =====
+function generatePassword() {
+  const len = parseInt(document.getElementById('gen-len').value) || 20;
+  let chars = 'abcdefghijklmnopqrstuvwxyz';
+  if (document.getElementById('gen-upper').checked) chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  if (document.getElementById('gen-num').checked) chars += '0123456789';
+  if (document.getElementById('gen-sym').checked) chars += '!@#$%^&*()-_=+[]{}|;:,.<>?';
+  const arr = crypto.getRandomValues(new Uint32Array(len));
+  const pwd = Array.from(arr).map(n => chars[n % chars.length]).join('');
+  const el = document.getElementById('gen-result');
+  el.textContent = pwd;
+  el.style.display = 'block';
+  document.getElementById('gen-hint').style.display = 'block';
+}
+
+function copyGenerated() {
+  const pwd = document.getElementById('gen-result').textContent;
+  if (pwd) { navigator.clipboard.writeText(pwd).then(() => toast('Mot de passe généré copié')); }
+}
+
+// ===== MASTER PASSWORDS CHANGE =====
+function toggleMaster() {
+  const p = document.getElementById('master-panel');
+  const icon = document.getElementById('master-toggle-icon');
+  if (p.style.display === 'block') { p.style.display = 'none'; icon.textContent = '▶'; }
+  else { p.style.display = 'block'; icon.textContent = '▼'; }
+}
+
+async function changeMasterPasswords() {
+  const p1 = document.getElementById('new-mp1').value;
+  const p2 = document.getElementById('new-mp2').value;
+  const p3 = document.getElementById('new-mp3').value;
+  if (!p1 || !p2 || !p3) { toast('Veuillez remplir les 3 champs'); return; }
+
+  const newKey = await deriveKey([p1, p2, p3]);
+  const newHash = await hashPasswords([p1, p2, p3]);
+
+  // Re-encrypt vault with new key
+  const raw = loadRaw() || {};
+  raw.masterHash = newHash;
+  raw.entries = await encrypt(newKey, JSON.stringify(vaultEntries));
+  saveRaw(raw);
+  sessionKey = newKey;
+
+  document.getElementById('new-mp1').value = '';
+  document.getElementById('new-mp2').value = '';
+  document.getElementById('new-mp3').value = '';
+  toast('Mots de passe master mis à jour');
+}
+
+// ===== EXPORT / IMPORT =====
+function exportVault() {
+  const raw = loadRaw();
+  if (!raw) { toast('Rien à exporter'); return; }
+  const blob = new Blob([JSON.stringify(raw, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const date = new Date().toISOString().slice(0,10);
+  a.download = `vault-backup-${date}.vault`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Coffre exporté');
+}
+
+function importVault(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.masterHash || !data.entries) { toast('Fichier invalide'); return; }
+      if (!confirm('⚠ Remplacer les données locales par ce fichier ?')) return;
+      saveRaw(data);
+      // Re-decrypt with current session key to verify compatibility
+      try {
+        const entries = await loadVault(sessionKey);
+        vaultEntries = entries;
+        renderVault();
+        toast('Import réussi — ' + entries.length + ' entrée(s)');
+      } catch {
+        // File is from a different master — still imported, will require re-login
+        sessionKey = null;
+        vaultEntries = [];
+        document.getElementById('vault-screen').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'block';
+        toast('Fichier importé — reconnectez-vous avec les masters du fichier');
+      }
+    } catch { toast('Erreur de lecture du fichier'); }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// Close modal on overlay click
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
